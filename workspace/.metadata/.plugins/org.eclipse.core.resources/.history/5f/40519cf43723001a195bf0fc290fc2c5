@@ -1,0 +1,43 @@
+package br.com.caelum.leilao.dominio;
+
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+public class LeilaoTest {
+
+	@Test
+	public void deveReceberUmLance() {
+		Leilao leilao = new Leilao("Lustre do Castelo lustre");
+		assertEquals(0, leilao.getLances().size());
+		
+		leilao.propoe(new Lance(new Usuario("professor Abobrinha"), 1000.0));
+		
+		assertEquals(1,	leilao.getLances().size());
+		assertEquals(1000.0, leilao.getLances().get(0).getValor(), 0.00001);
+	}
+	
+	@Test
+	public void deveReceberVariosLances() {
+		Leilao leilao = new Leilao("Lustre do Castelo Lustre");
+		leilao.propoe(new Lance(new Usuario("professor Abobrinha"), 1000.0));
+		leilao.propoe(new Lance(new Usuario("Nino"), 2000.0));
+		
+		assertEquals(2, leilao.getLances().size());
+		assertEquals(1000, leilao.getLances().get(0).getValor(), 0.00001);
+		assertEquals(2000, leilao.getLances().get(1).getValor(), 0.00001);
+		
+	}
+
+	@Test
+	private void naoDeveAceitarDoisLancesSeguidosDoMesmoUsuario() {
+		Leilao leilao = new Leilao("Whisky a cavalo");
+		Usuario zecaPagodinho = new Usuario("Zeca Pagodinho");
+		
+		leilao.propoe(new Lance(zecaPagodinho, 200.0));
+		leilao.propoe(new Lance(zecaPagodinho, 300.0));
+		
+		assertEquals(1, leilao.getLances().size());
+		assertEquals(200, leilao.getLances().get(0).getValor(), 0.00001);
+	}
+}

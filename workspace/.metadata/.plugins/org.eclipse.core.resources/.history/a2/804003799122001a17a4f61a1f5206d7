@@ -1,0 +1,38 @@
+package br.com.caelum.leilao.servico.teste;
+
+import org.junit.jupiter.api.Test;
+
+import br.com.caelum.leilao.dominio.Lance;
+import br.com.caelum.leilao.dominio.Leilao;
+import br.com.caelum.leilao.dominio.Usuario;
+import br.com.caelum.leilao.servico.Avaliador;
+import junit.framework.Assert;
+
+public class TesteDoAvaliador {
+
+	@Test
+	public void main(String[] args) {
+		// parte 1: Montar cenarios
+		Usuario joao = new Usuario("João");
+		Usuario jose = new Usuario("José");
+		Usuario maria = new Usuario("Maria");
+
+		Leilao leilao =  new Leilao("Playstation 5 Novo");
+		
+		leilao.propoe(new Lance(joao, 1500.0));
+		leilao.propoe(new Lance(jose, 2500.0));
+		leilao.propoe(new Lance(maria, 3500.0));
+		
+		// parte 2: Ação
+		Avaliador leiloeiro = new Avaliador();
+		leiloeiro.avalia(leilao);
+		
+		// parte 3: Validação
+		double maiorEsperado = 3500.0;
+		double menorEsperado = 2500.0;
+		
+		Assert.assertEquals(maiorEsperado, leiloeiro.getMaiorLance(), 0.00001);
+		Assert.assertEquals(menorEsperado, leiloeiro.getMenorLance(), 0.00001);
+	}
+
+}

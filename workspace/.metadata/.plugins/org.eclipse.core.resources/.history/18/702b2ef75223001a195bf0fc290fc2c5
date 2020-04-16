@@ -1,0 +1,119 @@
+package br.com.caelum.leilao.servico.teste;
+
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import br.com.caelum.leilao.builder.CriadorDeLeilao;
+import br.com.caelum.leilao.dominio.Lance;
+import br.com.caelum.leilao.dominio.Leilao;
+import br.com.caelum.leilao.dominio.Usuario;
+import br.com.caelum.leilao.servico.Avaliador;
+
+public class TesteDoAvaliador {
+
+	private Avaliador leiloeiro;
+	private Usuario marcos;
+	private Usuario beatriz;
+	private Usuario anne;
+	private Usuario vitoria;
+	private Usuario sara;
+	private Usuario lia;
+	private Usuario muza;
+
+	@Before
+	public void criaAvaliador() {
+		this.leiloeiro = new Avaliador();
+		this.marcos = new Usuario("Marcos");
+		this.anne = new Usuario("Anne");
+		this.beatriz = new Usuario("Beatriz");
+		this.vitoria = new Usuario("Vitoria");
+		this.sara = new Usuario("Sara");
+		this.lia = new Usuario("Lia");
+		this.muza = new Usuario("Muza");
+	}
+
+	@Test
+	public void deveEntenderLancesEmOrdemCrescente() {
+		// parte 1: Montar cenarios
+		Leilao leilao = new CriadorDeLeilao().para("Whisky a cavalo")
+				.lance(marcos, 3500.0).lance(muza, 1500.0)
+				.constroi();
+
+		// parte 2: Ação
+		leiloeiro.avalia(leilao);
+
+		// parte 3: Validação
+		double maiorEsperado = 3500.0;
+		double menorEsperado = 1500.0;
+
+		assertEquals(maiorEsperado, leiloeiro.getMaiorLance(), 0.00001);
+		assertEquals(menorEsperado, leiloeiro.getMenorLance(), 0.00001);
+	}
+
+	@Test
+	public void deveEntenderLancesEmOrdemDecrescente() {
+		Leilao leilao = new CriadorDeLeilao().para("Whisky a cavalo")
+				.lance(marcos, 4500.0).lance(muza, 1500.0)
+				.lance(anne, 1500.0)
+				.constroi();
+
+		leiloeiro.avalia(leilao);
+
+		assertEquals(4500.0, leiloeiro.getMaiorLance(), 0.00001);
+		assertEquals(1500.0, leiloeiro.getMenorLance(), 0.00001);
+	}
+
+	@Test
+	public void deveEntenderLeilaoComApenasUmLance() {
+		Leilao leilao = new CriadorDeLeilao().para("Whisky a cavalo")
+				.lance(marcos, 1000.0)
+				.constroi();
+
+		leiloeiro.avalia(leilao);
+
+		assertEquals(1000.0, leiloeiro.getMaiorLance(), 0.00001);
+		assertEquals(1000.0, leiloeiro.getMenorLance(), 0.00001);
+
+	}
+
+	@Test
+	public void deveEncontrarOsTresMaioresLances() {
+		Leilao leilao = new CriadorDeLeilao().para("Whisky a cavalo")
+				.lance(marcos, 400.0).lance(muza, 300.0)
+				.lance(anne, 200.0).lance(beatriz, 100.0)
+				.lance(marcos, 100.0).lance(sara, 100.0)
+				.lance(vitoria, 100.0).lance(lia, 10.0)
+				.constroi();
+		leiloeiro.avalia(leilao);
+
+		List<Lance> maiores = leiloeiro.getTresMaiores();
+		assertEquals(3, maiores.size());
+		assertEquals(400.0, maiores.get(0).getValor(), 0.00001);
+		assertEquals(300.0, maiores.get(1).getValor(), 0.00001);
+		assertEquals(200.0, maiores.get(2).getValor(), 0.00001);
+
+	}
+
+	@Test
+	public void deveEntenderLeilaoComLancesEmOrdemRandomica() {
+		Leilao leilao = new CriadorDeLeilao().para("Whisky a cavalo")
+				.lance(marcos, 900.0).lance(muza, 120.0)
+				.constroi();
+
+		leiloeiro.avalia(leilao);
+
+		assertEquals(900, leiloeiro.getMaiorLance(), 0.00001);
+		assertEquals(120, leiloeiro.getMenorLance(), 0.00001);
+
+	}
+
+	@After
+	public void finaliza() {
+	  System.out.println("fim");
+	}
+}
